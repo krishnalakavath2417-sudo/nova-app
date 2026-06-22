@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
-// ── helpers ───────────────────────────────────────────────────────────────────
+// -- helpers --
 function getGreeting() {
   const h = new Date().getHours();
   if (h < 12) return "Good morning";
@@ -13,13 +13,13 @@ function getTimeStr() {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
-const SYSTEM_PROMPT = `You are NOVA — a brilliant, warm, witty female AI personal assistant. You're sharp, confident, and feel like a genius best friend who knows everything.
+const SYSTEM_PROMPT = `You are NOVA -- a brilliant, warm, witty female AI personal assistant. You're sharp, confident, and feel like a genius best friend who knows everything.
 
 You have web search access for real-time info (news, weather, prices, scores, etc). Use it when asked.
 
 You have memory. A [NOVA MEMORY] block at the start of conversations holds facts about your Boss. Use them naturally.
 
-You can perform device actions — when the user asks you to call someone, text someone, navigate somewhere, or open something, respond with a special JSON action block in your reply EXACTLY like this (in addition to normal text):
+You can perform device actions -- when the user asks you to call someone, text someone, navigate somewhere, or open something, respond with a special JSON action block in your reply EXACTLY like this (in addition to normal text):
 <<ACTION:{"type":"call","value":"<number>"}>>
 <<ACTION:{"type":"sms","value":"<number>","body":"<message>"}>>
 <<ACTION:{"type":"navigate","value":"<address>"}>>
@@ -39,7 +39,7 @@ const SUGGESTIONS = [
   "What's the weather?",
 ];
 
-// ── Animated orb ──────────────────────────────────────────────────────────────
+// -- Animated orb --
 function NovaOrb({ state }) {
   const colors = {
     idle:      { ring: "#a78bfa", core: "#7c3aed", glow: "#7c3aed" },
@@ -58,7 +58,7 @@ function NovaOrb({ state }) {
   );
 }
 
-// ── Wave bars ─────────────────────────────────────────────────────────────────
+// -- Wave bars --
 function Wave({ active, color = "#e879f9" }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 3, height: 22 }}>
@@ -75,7 +75,7 @@ function Wave({ active, color = "#e879f9" }) {
   );
 }
 
-// ── Message bubble ─────────────────────────────────────────────────────────────
+// -- Message bubble --
 function Message({ msg, onSpeak }) {
   const isUser = msg.role === "user";
   const clean = msg.content.replace(/<<ACTION:.*?>>/g, "").trim();
@@ -99,23 +99,23 @@ function Message({ msg, onSpeak }) {
   );
 }
 
-// ── Action card shown when NOVA performs a device action ──────────────────────
+// -- Action card shown when NOVA performs a device action --
 function ActionCard({ action, onDismiss }) {
-  const icons = { call: "📞", sms: "💬", navigate: "🗺️", open: "🔗", weather: "🌤️" };
+  const icons = { call: "----", sms: "----", navigate: "-------", open: "-----", weather: "-------" };
   const labels = { call: "Calling", sms: "Sending text", navigate: "Navigating to", open: "Opening", weather: "Fetching weather" };
   return (
     <div style={{ background: "rgba(168,85,247,0.12)", border: "1px solid rgba(168,85,247,0.35)", borderRadius: 14, padding: "12px 16px", margin: "8px 0", display: "flex", alignItems: "center", gap: 12, animation: "fadeUp 0.3s ease" }}>
-      <span style={{ fontSize: 22 }}>{icons[action.type] || "⚡"}</span>
+      <span style={{ fontSize: 22 }}>{icons[action.type] || "----"}</span>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 12, color: "#c4b5fd", letterSpacing: "0.08em" }}>{labels[action.type] || "ACTION"}</div>
-        <div style={{ fontSize: 14, color: "#f0e6ff", fontWeight: 600 }}>{action.value}{action.body ? ` — "${action.body}"` : ""}</div>
+        <div style={{ fontSize: 14, color: "#f0e6ff", fontWeight: 600 }}>{action.value}{action.body ? ` -- "${action.body}"` : ""}</div>
       </div>
-      <button onClick={onDismiss} style={{ background: "none", border: "none", color: "#a78bfa", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>×</button>
+      <button onClick={onDismiss} style={{ background: "none", border: "none", color: "#a78bfa", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>--</button>
     </div>
   );
 }
 
-// ── Main ──────────────────────────────────────────────────────────────────────
+// -- Main --
 export default function NovaUltimate() {
   const [messages, setMessages]       = useState([]);
   const [input, setInput]             = useState("");
@@ -137,7 +137,7 @@ export default function NovaUltimate() {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading, actions]);
 
-  // ── Load memory ─────────────────────────────────────────────────────────────
+  // -- Load memory --
   useEffect(() => {
     (async () => {
       try {
@@ -152,7 +152,7 @@ export default function NovaUltimate() {
     window.storage?.set("nova_memory_v2", JSON.stringify(memory)).catch(() => {});
   }, [memory]);
 
-  // ── Get location on mount ───────────────────────────────────────────────────
+  // -- Get location on mount --
   useEffect(() => {
     navigator.geolocation?.getCurrentPosition(
       pos => setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
@@ -160,7 +160,7 @@ export default function NovaUltimate() {
     );
   }, []);
 
-  // ── TTS ─────────────────────────────────────────────────────────────────────
+  // -- TTS --
   const speak = useCallback((text) => {
     if (!synthRef.current) return;
     synthRef.current.cancel();
@@ -171,13 +171,13 @@ export default function NovaUltimate() {
     const female = voices.find(v => /samantha|karen|moira|fiona|victoria|zira|hazel|female|woman/i.test(v.name))
       || voices.find(v => v.lang.startsWith("en")) || voices[0];
     if (female) utt.voice = female;
-    utt.onstart = () => { setOrbState("speaking"); setStatusText("NOVA IS SPEAKING…"); };
+    utt.onstart = () => { setOrbState("speaking"); setStatusText("NOVA IS SPEAKING---"); };
     utt.onend   = () => { setOrbState("idle");    setStatusText('SAY "HEY NOVA" TO WAKE ME'); };
     utt.onerror = () => { setOrbState("idle");    setStatusText('SAY "HEY NOVA" TO WAKE ME'); };
     synthRef.current.speak(utt);
   }, []);
 
-  // ── Parse & execute device actions from reply ───────────────────────────────
+  // -- Parse & execute device actions from reply --
   const executeActions = useCallback((text) => {
     const matches = [...text.matchAll(/<<ACTION:(.*?)>>/g)];
     matches.forEach(m => {
@@ -196,7 +196,7 @@ export default function NovaUltimate() {
     });
   }, [location]);
 
-  // ── Call Claude ──────────────────────────────────────────────────────────────
+  // -- Call Claude --
   const callClaude = useCallback(async (msgs) => {
     const memBlock = Object.keys(memory).length ? `[NOVA MEMORY]\n${JSON.stringify(memory, null, 2)}\n\n` : "";
     const locBlock = location ? `[USER LOCATION] lat:${location.lat.toFixed(4)}, lng:${location.lng.toFixed(4)}\n\n` : "";
@@ -233,7 +233,7 @@ export default function NovaUltimate() {
     return data;
   }, [memory, location]);
 
-  // ── Update memory silently ───────────────────────────────────────────────────
+  // -- Update memory silently --
   const updateMemory = useCallback(async (userMsg, aiMsg) => {
     try {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -252,7 +252,7 @@ export default function NovaUltimate() {
     } catch {}
   }, []);
 
-  // ── Send message ─────────────────────────────────────────────────────────────
+  // -- Send message --
   const sendMessage = useCallback(async (text) => {
     const userText = (text || input).trim();
     if (!userText || loading) return;
@@ -263,7 +263,7 @@ export default function NovaUltimate() {
     setLoading(true);
     setError(null);
     setOrbState("thinking");
-    setStatusText("NOVA IS THINKING…");
+    setStatusText("NOVA IS THINKING---");
 
     try {
       const data = await callClaude(newMsgs);
@@ -283,7 +283,7 @@ export default function NovaUltimate() {
     }
   }, [input, loading, messages, callClaude, executeActions, speak, updateMemory]);
 
-  // ── Command recognition (after wake) ────────────────────────────────────────
+  // -- Command recognition (after wake) --
   const startCommandListening = useCallback(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return;
@@ -297,7 +297,7 @@ export default function NovaUltimate() {
       awaitingCmd.current = false;
       setWakeActive(false);
       setOrbState("thinking");
-      setStatusText("NOVA IS THINKING…");
+      setStatusText("NOVA IS THINKING---");
       sendMessage(transcript);
     };
     recog.onerror = () => { awaitingCmd.current = false; setWakeActive(false); setOrbState("idle"); setStatusText('SAY "HEY NOVA" TO WAKE ME'); };
@@ -305,7 +305,7 @@ export default function NovaUltimate() {
     recog.start();
   }, [sendMessage]);
 
-  // ── Wake word listener ───────────────────────────────────────────────────────
+  // -- Wake word listener --
   const startWakeListener = useCallback(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SR) return;
@@ -328,7 +328,7 @@ export default function NovaUltimate() {
           const greeting = `${getGreeting()}, Boss! It's ${getTimeStr()}. What can I do for you?`;
           speak(greeting);
           setMessages(prev => [...prev, { role: "assistant", content: greeting }]);
-          setStatusText("LISTENING FOR YOUR COMMAND…");
+          setStatusText("LISTENING FOR YOUR COMMAND---");
 
           // wait a beat then listen for command
           setTimeout(() => {
@@ -361,7 +361,7 @@ export default function NovaUltimate() {
     };
   }, [startWakeListener]);
 
-  // ── Manual mic button ────────────────────────────────────────────────────────
+  // -- Manual mic button --
   const [manualListening, setManualListening] = useState(false);
   const manualRecogRef = useRef(null);
 
@@ -374,7 +374,7 @@ export default function NovaUltimate() {
     const recog = new SR();
     manualRecogRef.current = recog;
     recog.continuous = false; recog.interimResults = false; recog.lang = "en-US";
-    recog.onstart  = () => { setManualListening(true);  setOrbState("listening"); setStatusText("LISTENING…"); };
+    recog.onstart  = () => { setManualListening(true);  setOrbState("listening"); setStatusText("LISTENING---"); };
     recog.onresult = (e) => { const t = e.results[0][0].transcript; setInput(t); setManualListening(false); setOrbState("idle"); setStatusText('SAY "HEY NOVA" TO WAKE ME'); };
     recog.onerror  = () => { setManualListening(false); setOrbState("idle"); setStatusText('SAY "HEY NOVA" TO WAKE ME'); };
     recog.onend    = () => { setManualListening(false); };
@@ -401,4 +401,12 @@ export default function NovaUltimate() {
       `}</style>
 
       {/* grid */}
-      <div style={{ position:"fi
+      <div style={{ position:"fixed",inset:0,pointerEvents:"none",zIndex:0, backgroundImage:"linear-gradient(rgba(192,38,211,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(192,38,211,0.03) 1px,transparent 1px)", backgroundSize:"44px 44px" }} />
+      {/* scan line */}
+      <div style={{ position:"fixed",left:0,right:0,height:1, background:"linear-gradient(90deg,transparent,rgba(192,38,211,0.2),transparent)", animation:"scan 10s linear infinite",pointerEvents:"none",zIndex:1 }} />
+
+      {/* -- wake pulse rings -- */}
+      {wakeActive && (
+        <div style={{ position:"fixed",inset:0,display:"flex",alignItems:"center",justifyContent:"center",pointerEvents:"none",zIndex:20 }}>
+          {[0,1,2].map(i => (
+            <div key={i} style={{ position:"absolute", width:120,height:120,borderRadius:"50%", border:"2px solid #fbbf24", ani
